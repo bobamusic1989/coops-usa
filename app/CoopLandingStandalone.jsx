@@ -4,9 +4,9 @@ export default function CoopLandingStandalone() {
   // STATE
   const [wood, setWood] = useState("cedar");         // "cedar" | "pine"
   const [roof, setRoof] = useState("gable");         // "gable" | "lean-to"
-  const [roofMat, setRoofMat] = useState("wood");    // "wood" | "metal"
-  const [levels, setLevels] = useState(2);           // 1 | 2
-  const [timedDoor, setTimedDoor] = useState(false); // timed / auto door
+  const [roofMat, setRoofMat] = useState("metal");   // "wood" | "metal"
+  const [levels, setLevels] = useState(2);           // 1 | 2  (2 = partial loft + ladder)
+  const [timedDoor, setTimedDoor] = useState(false); // auto/timed door
   const [lengthFt, setLengthFt] = useState(11);      // 4..16
   const [hardware, setHardware] = useState("black"); // "black" | "galvanized"
 
@@ -25,9 +25,9 @@ export default function CoopLandingStandalone() {
     const perFoot = w === "cedar" ? 280 : 220;
     const roofAdj = r === "gable" ? 350 : 180;
     const hardwareAdj = h === "black" ? 120 : 0;
-    const levelAdj = levels === 2 ? 350 : 0;            // loft + ramp
-    const roofMatAdj = roofMat === "metal" ? 220 : 0;   // sheet metal
-    const timedDoorAdj = timedDoor ? 180 : 0;           // controller + install
+    const levelAdj = levels === 2 ? 350 : 0;          // loft + ladder
+    const roofMatAdj = roofMat === "metal" ? 220 : 0; // sheet metal upcharge
+    const timedDoorAdj = timedDoor ? 180 : 0;         // controller + install
     return Math.round(
       base + perFoot * len + roofAdj + hardwareAdj + levelAdj + roofMatAdj + timedDoorAdj
     );
@@ -37,10 +37,10 @@ export default function CoopLandingStandalone() {
     [wood, roof, hardware, lengthFt, levels, roofMat, timedDoor]
   );
 
-  // tiny sanity tests (console)
+  // tiny sanity
   useEffect(() => {
     try {
-      console.assert(estimatePrice("cedar","gable","black",8,1,"wood",false) === 5910, "base sanity");
+      console.assert(estimatePrice("cedar","gable","black",8,1,"wood",false) === 5910, "sanity ok");
     } catch {}
   }, []);
 
@@ -63,7 +63,10 @@ export default function CoopLandingStandalone() {
         <div className="wrap bar">
           <div className="logo">
             <span className="badge" aria-hidden>
-              <svg viewBox="0 0 48 48" width="24" height="24" role="img"><path d="M6 32h36M6 24h36M6 16h36" stroke="rgba(0,0,0,.55)" strokeWidth="2"/><path d="M9 18l8-8 8 8 8-8 7 7" fill="none" stroke="#0b0b0c" strokeWidth="3"/></svg>
+              <svg viewBox="0 0 48 48" width="24" height="24" role="img" aria-label="USA hand-built">
+                <path d="M6 32h36M6 24h36M6 16h36" stroke="rgba(0,0,0,.55)" strokeWidth="2" />
+                <path d="M9 18l8-8 8 8 8-8 7 7" fill="none" stroke="#0b0b0c" strokeWidth="3" />
+              </svg>
             </span>
             <div>COOPS<span style={{color:"var(--brand)",margin:"0 .25rem"}}>/</span>USA</div>
           </div>
@@ -82,85 +85,77 @@ export default function CoopLandingStandalone() {
             <p className="muted" style={{ margin: "8px 0 0" }}>Cedar & Pine • Predator-proof • Custom dimensions.</p>
 
             <div className="controls" style={{ marginTop: 28, display: "grid", gap: 20 }}>
-              {/* Wood */}
               <div>
                 <label>Wood</label>
                 <div className="row">
-                  {["cedar", "pine"].map(w => (
-                    <button key={w} type="button" onClick={() => setWood(w)} className={"toggle" + (wood === w ? " active" : "")}>{w.toUpperCase()}</button>
+                  {["cedar","pine"].map(w=>(
+                    <button key={w} type="button" onClick={()=>setWood(w)} className={"toggle"+(wood===w?" active":"")}>{w.toUpperCase()}</button>
                   ))}
                 </div>
               </div>
 
-              {/* Roof shape */}
               <div>
                 <label>Roof</label>
                 <div className="row">
-                  {["gable", "lean-to"].map(r => (
-                    <button key={r} type="button" onClick={() => setRoof(r)} className={"toggle" + (roof === r ? " active" : "")}>{r.toUpperCase()}</button>
+                  {["gable","lean-to"].map(r=>(
+                    <button key={r} type="button" onClick={()=>setRoof(r)} className={"toggle"+(roof===r?" active":"")}>{r.toUpperCase()}</button>
                   ))}
                 </div>
               </div>
 
-              {/* Roof material */}
               <div>
                 <label>Roof Material</label>
                 <div className="row">
-                  {["wood", "metal"].map(m => (
-                    <button key={m} type="button" onClick={() => setRoofMat(m)} className={"toggle" + (roofMat === m ? " active" : "")}>
-                      {m === "metal" ? "SHEET METAL" : "WOOD"}
+                  {["wood","metal"].map(m=>(
+                    <button key={m} type="button" onClick={()=>setRoofMat(m)} className={"toggle"+(roofMat===m?" active":"")}>
+                      {m==="metal"?"SHEET METAL":"WOOD"}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Levels */}
               <div>
                 <label>Levels</label>
                 <div className="row">
-                  {[1, 2].map(n => (
-                    <button key={n} type="button" onClick={() => setLevels(n)} className={"toggle" + (levels === n ? " active" : "")}>
-                      {n} LEVEL{n === 1 ? "" : "S"}
+                  {[1,2].map(n=>(
+                    <button key={n} type="button" onClick={()=>setLevels(n)} className={"toggle"+(levels===n?" active":"")}>
+                      {n} LEVEL{n===1?"":"S"}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Timed Door */}
               <div>
                 <label>Timed Door</label>
                 <div className="row">
-                  {[false, true].map(v => (
-                    <button key={v ? "yes" : "no"} type="button" onClick={() => setTimedDoor(v)} className={"toggle" + (timedDoor === v ? " active" : "")}>
-                      {v ? "YES" : "NO"}
+                  {[false,true].map(v=>(
+                    <button key={v?"yes":"no"} type="button" onClick={()=>setTimedDoor(v)} className={"toggle"+(timedDoor===v?" active":"")}>
+                      {v?"YES":"NO"}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Length */}
               <div>
                 <label>Length (coop + run)</label>
-                <div className="row" style={{ alignItems: "center" }}>
-                  <input type="range" min={4} max={16} value={lengthFt} onChange={(e) => setLengthFt(parseInt(e.target.value, 10))} />
-                  <div style={{ width: 48, textAlign: "right", font: "600 14px ui-monospace,Menlo,Consolas,monospace" }}>{lengthFt}′</div>
+                <div className="row" style={{alignItems:"center"}}>
+                  <input type="range" min={4} max={16} value={lengthFt} onChange={(e)=>setLengthFt(parseInt(e.target.value,10))}/>
+                  <div style={{width:48,textAlign:"right",font:"600 14px ui-monospace,Menlo,Consolas,monospace"}}>{lengthFt}′</div>
                 </div>
               </div>
 
-              {/* Hardware */}
               <div>
                 <label>Hardware Finish</label>
                 <div className="row">
-                  {["black", "galvanized"].map(h => (
-                    <button key={h} type="button" onClick={() => setHardware(h)} className={"toggle" + (hardware === h ? " active" : "")}>{h.toUpperCase()}</button>
+                  {["black","galvanized"].map(h=>(
+                    <button key={h} type="button" onClick={()=>setHardware(h)} className={"toggle"+(hardware===h?" active":"")}>{h.toUpperCase()}</button>
                   ))}
                 </div>
               </div>
 
-              {/* Price */}
               <div className="price">
-                <div className="muted" style={{ fontSize: 13 }}>Visual estimate</div>
-                <div style={{ font: "700 26px/1.1 ui-sans-serif" }}>{`$${price.toLocaleString()}`}</div>
+                <div className="muted" style={{fontSize:13}}>Visual estimate</div>
+                <div style={{font:"700 26px/1.1 ui-sans-serif"}}>{`$${price.toLocaleString()}`}</div>
               </div>
 
               <div className="cta">
@@ -195,9 +190,9 @@ export default function CoopLandingStandalone() {
       <section id="proof" className="section">
         <div className="wrap" style={{ padding: "72px 20px" }}>
           <div className="grid cards">
-            <ProofCard title="Joinery" subtitle="Tight seams, zero rattle"><JoinerySVG /></ProofCard>
-            <ProofCard title="Hardware Cloth" subtitle="1/2″ mesh, wrapped & stapled"><MeshSVG /></ProofCard>
-            <ProofCard title="Vent & Clean-out" subtitle="Dry interior, easy to service"><VentSVG /></ProofCard>
+            <ProofCard title="Joinery" subtitle="Tight seams, zero rattle"><JoinerySVG/></ProofCard>
+            <ProofCard title="Hardware Cloth" subtitle="1/2″ mesh, wrapped & stapled"><MeshSVG/></ProofCard>
+            <ProofCard title="Vent & Clean-out" subtitle="Dry interior, easy to service"><VentSVG/></ProofCard>
           </div>
         </div>
       </section>
@@ -207,15 +202,15 @@ export default function CoopLandingStandalone() {
         <div className="wrap" style={{ padding: "72px 20px" }}>
           <div className="grid specs">
             <div>
-              <h2 style={{ margin: 0, fontSize: 32 }}>Specs</h2>
-              <ul style={{ margin: "18px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 12, color: "#ddd" }}>
+              <h2 style={{margin:0,fontSize:32}}>Specs</h2>
+              <ul style={{margin:"18px 0 0",padding:0,listStyle:"none",display:"grid",gap:12,color:"#ddd"}}>
                 <li><span className="chip"><span className="ic" />Cedar / Pine</span></li>
                 <li><span className="chip"><span className="ic" />Predator Latches</span></li>
                 <li><span className="chip"><span className="ic" />Custom Dimensions</span></li>
                 <li><span className="chip"><span className="ic" />Hand Finished</span></li>
               </ul>
             </div>
-            <div><SpecGrid /></div>
+            <div><SpecGrid/></div>
           </div>
         </div>
       </section>
@@ -223,20 +218,20 @@ export default function CoopLandingStandalone() {
       {/* Quote */}
       <section id="quote" className="section">
         <div className="wrap" style={{ padding: "72px 20px" }}>
-          <h2 style={{ margin: 0, fontSize: 32 }}>Start Your Build</h2>
-          <p className="muted" style={{ margin: "6px 0 0" }}>Zero obligation. Send your rough config — we’ll reply with a dialed proposal.</p>
+          <h2 style={{margin:0,fontSize:32}}>Start Your Build</h2>
+          <p className="muted" style={{margin:"6px 0 0"}}>Zero obligation. Send your rough config — we’ll reply with a dialed proposal.</p>
           <form
-            onSubmit={(e) => { e.preventDefault(); const data = Object.fromEntries(new FormData(e.currentTarget)); const url = mailtoQuote({ wood, roof, lengthFt, hardware, levels, roofMat, timedDoor, ...data }); window.location.href = url; }}
-            style={{ marginTop: 22, display: "grid", gap: 12, gridTemplateColumns: "repeat(1,1fr)" }}
+            onSubmit={(e)=>{e.preventDefault(); const data = Object.fromEntries(new FormData(e.currentTarget)); const url = mailtoQuote({ wood, roof, lengthFt, hardware, levels, roofMat, timedDoor, ...data }); window.location.href = url;}}
+            style={{marginTop:22,display:"grid",gap:12,gridTemplateColumns:"repeat(1,1fr)"}}
           >
-            <input name="name" placeholder="Your name" required className="spec" style={{ padding: 12 }} />
-            <input name="email" type="email" placeholder="Email" required className="spec" style={{ padding: 12 }} />
-            <input name="phone" placeholder="Phone (optional)" className="spec" style={{ padding: 12 }} />
-            <input name="city" placeholder="City, State" className="spec" style={{ padding: 12 }} />
-            <textarea name="notes" rows={4} placeholder="Notes (site photos, flock size, deadlines)" className="spec" style={{ padding: 12 }} />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div className="muted" style={{ fontSize: 14 }}>USA-made • Built to order</div>
-              <button className="primary" style={{ border: "none", borderRadius: 14, padding: "12px 18px", cursor: "pointer" }}>Send</button>
+            <input name="name" placeholder="Your name" required className="spec" style={{padding:12}}/>
+            <input name="email" type="email" placeholder="Email" required className="spec" style={{padding:12}}/>
+            <input name="phone" placeholder="Phone (optional)" className="spec" style={{padding:12}}/>
+            <input name="city" placeholder="City, State" className="spec" style={{padding:12}}/>
+            <textarea name="notes" rows={4} placeholder="Notes (site photos, flock size, deadlines)" className="spec" style={{padding:12}}/>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+              <div className="muted" style={{fontSize:14}}>USA-made • Built to order</div>
+              <button className="primary" style={{border:"none",borderRadius:14,padding:"12px 18px",cursor:"pointer"}}>Send</button>
             </div>
           </form>
         </div>
@@ -246,17 +241,17 @@ export default function CoopLandingStandalone() {
       <section className="section">
         <div className="wrap footer" style={{ padding: "28px 20px 72px" }}>
           <div>© {new Date().getFullYear()} COOPS/USA — All rights reserved.</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span className="pulse" /><span>Hand-built in the USA</span></div>
+          <div style={{display:"flex",alignItems:"center",gap:10}}><span className="pulse"/><span>Hand-built in the USA</span></div>
         </div>
       </section>
 
       {/* Mobile Sticky */}
       <div className="mobile-sticky">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div className="muted" style={{ fontSize: 14 }}>Visual estimate</div>
-          <div style={{ font: "700 18px/1 ui-sans-serif" }}>{`$${price.toLocaleString()}`}</div>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div className="muted" style={{fontSize:14}}>Visual estimate</div>
+          <div style={{font:"700 18px/1 ui-sans-serif"}}>{`$${price.toLocaleString()}`}</div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8 }}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:8}}>
           <a className="primary" href={mailtoQuote({ wood, roof, lengthFt, hardware, levels, roofMat, timedDoor })}>Build</a>
           <a className="ghost" href="#build">Edit</a>
         </div>
@@ -270,34 +265,50 @@ export default function CoopLandingStandalone() {
 function ProofCard({ title, subtitle, children }) {
   return (
     <div className="card">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h3 style={{ margin: 0 }}>{title}</h3>
-        <span className="muted" style={{ fontSize: 12 }}>craft</span>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
+        <h3 style={{margin:0}}>{title}</h3>
+        <span className="muted" style={{fontSize:12}}>craft</span>
       </div>
-      <p className="muted" style={{ margin: "6px 0 12px", fontSize: 14 }}>{subtitle}</p>
-      <div className="card" style={{ padding: 12, height: 180 }}>{children}</div>
+      <p className="muted" style={{margin:"6px 0 12px",fontSize:14}}>{subtitle}</p>
+      <div className="card" style={{padding:12,height:180}}>{children}</div>
     </div>
   );
 }
-function JoinerySVG(){/* …same as before… */ return (
+
+function JoinerySVG(){ return (
   <svg viewBox="0 0 300 160" width="100%" height="100%">
-    <defs><linearGradient id="wood" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#b7773a"/><stop offset="100%" stopColor="#6e3f16"/></linearGradient></defs>
+    <defs>
+      <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#b7773a"/><stop offset="100%" stopColor="#6e3f16"/>
+      </linearGradient>
+    </defs>
     <rect x="10" y="20" width="280" height="120" rx="14" fill="url(#wood)"/>
     <g opacity=".55">{Array.from({length:7}).map((_,i)=>(<rect key={i} x={25+i*38} y={20} width="18" height="60" fill="#000"/>))}</g>
     <rect x="10" y="80" width="280" height="60" rx="14" fill="#000" opacity=".2"/>
   </svg>
 );}
-function MeshSVG(){/* …same… */ return (
+
+function MeshSVG(){ return (
   <svg viewBox="0 0 300 160" width="100%" height="100%">
-    <defs><pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M0 0 L16 0 M0 0 L0 16" stroke="#9ca3af" strokeWidth="1"/><path d="M16 0 L16 16 M0 16 L16 16" stroke="#9ca3af" strokeWidth="1" opacity=".4"/></pattern></defs>
+    <defs>
+      <pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse">
+        <path d="M0 0 L16 0 M0 0 L0 16" stroke="#9ca3af" strokeWidth="1"/>
+        <path d="M16 0 L16 16 M0 16 L16 16" stroke="#9ca3af" strokeWidth="1" opacity=".4"/>
+      </pattern>
+    </defs>
     <rect x="10" y="20" width="280" height="120" rx="12" fill="#111"/>
     <rect x="20" y="30" width="260" height="100" rx="10" fill="url(#grid)"/>
     <rect x="20" y="30" width="260" height="100" rx="10" fill="none" stroke="#9ca3af" strokeWidth="2"/>
   </svg>
 );}
-function VentSVG(){/* …same… */ return (
+
+function VentSVG(){ return (
   <svg viewBox="0 0 300 160" width="100%" height="100%">
-    <defs><linearGradient id="vent" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#111827"/><stop offset="100%" stopColor="#0b1220"/></linearGradient></defs>
+    <defs>
+      <linearGradient id="vent" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#111827"/><stop offset="100%" stopColor="#0b1220"/>
+      </linearGradient>
+    </defs>
     <rect x="10" y="20" width="280" height="120" rx="12" fill="url(#vent)"/>
     {Array.from({length:7}).map((_,i)=>(<rect key={i} x={26+i*36} y={30} width="14" height="100" fill="#1f2937"/>))}
     <path d="M20 120 C80 90,120 150,180 120 S260 140,290 110" stroke="#7dd3fc" strokeWidth="2" fill="none" opacity=".7"/>
@@ -317,8 +328,8 @@ function SpecGrid(){
     <div className="specgrid">
       {items.map(it=>(
         <div key={it.k} className="spec">
-          <div className="muted" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: ".18em" }}>{it.k}</div>
-          <div style={{ fontWeight: 600 }}>{it.v}</div>
+          <div className="muted" style={{fontSize:12,textTransform:"uppercase",letterSpacing:".18em"}}>{it.k}</div>
+          <div style={{fontWeight:600}}>{it.v}</div>
         </div>
       ))}
     </div>
@@ -326,14 +337,16 @@ function SpecGrid(){
 }
 
 function CoopSVG({ woodColors, meshStroke, roof, roofMat, lengthFt, levels, timedDoor }) {
-  const unit = 18; // px per foot
+  const unit = 18; // px per foot (visual only)
   const coopH = 6 * unit;
   const L = Math.max(4, Math.min(16, lengthFt)) * unit;
   const D = 4 * unit;
   const isoX = 0.9, isoY = 0.5;
   const sox = D * isoX, soy = D * isoY;
-  const roofH = unit * (roof === "gable" ? 1.6 : 1.0); // taller to show above top
-  const eave = unit * 0.5; // front overhang
+
+  // taller so roof shows above; mild eave
+  const roofH = unit * (roof === "gable" ? 1.6 : 1.0);
+  const eave = unit * 0.6;
 
   function shade(hex, amt) {
     const x = hex.replace("#", "");
@@ -344,44 +357,56 @@ function CoopSVG({ woodColors, meshStroke, roof, roofMat, lengthFt, levels, time
 
   const viewW = L + sox * 1.35;
   const viewH = coopH + roofH + soy + 70;
-  const viewX = -sox * 0.4 - eave;
+  const viewX = -sox * 0.45 - eave;
   const viewY = -(roofH + soy + 30);
 
   return (
     <div style={{ position: "relative", width: "100%", paddingTop: "56.25%" }}>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`} style={{ position:"absolute", inset:0 }}>
         <defs>
-          <filter id="grain-wood" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="2"/><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .18 0"/></filter>
-          <pattern id="mesh" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 0 L8 0 M0 0 L0 8" stroke={meshStroke} strokeWidth="1"/><path d="M8 0 L8 8 M0 8 L8 8" stroke={meshStroke} strokeWidth="1" opacity=".35"/></pattern>
-          <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#9AA4AE"/><stop offset="50%" stopColor="#CBD5E1"/><stop offset="100%" stopColor="#8B95A1"/></linearGradient>
-          <pattern id="corr" width="10" height="6" patternUnits="userSpaceOnUse"><rect width="10" height="6" fill="url(#metalGrad)"/><line x1="0" y1="3" x2="10" y2="3" stroke="#6B7280" strokeWidth="0.8" opacity="0.7"/></pattern>
+          <filter id="grain-wood" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="2" />
+            <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .18 0" />
+          </filter>
+          <pattern id="mesh" width="8" height="8" patternUnits="userSpaceOnUse">
+            <path d="M0 0 L8 0 M0 0 L0 8" stroke={meshStroke} strokeWidth="1" />
+            <path d="M8 0 L8 8 M0 8 L8 8" stroke={meshStroke} strokeWidth="1" opacity=".35" />
+          </pattern>
+          {/* sheet-metal corrugation */}
+          <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#9AA4AE"/><stop offset="50%" stopColor="#CBD5E1"/><stop offset="100%" stopColor="#8B95A1"/>
+          </linearGradient>
+          <pattern id="corr" width="10" height="6" patternUnits="userSpaceOnUse">
+            <rect width="10" height="6" fill="url(#metalGrad)"/>
+            <line x1="0" y1="3" x2="10" y2="3" stroke="#6B7280" strokeWidth="0.8" opacity="0.7"/>
+          </pattern>
         </defs>
 
         {/* ground shadow */}
         <ellipse cx={L * 0.55} cy={coopH + soy + 26} rx={L * 0.45} ry={24} fill="black" opacity="0.35" />
 
-        {/* ROOF FIRST (behind wall) — with eave/overhang showing above */}
+        {/* ROOF FIRST (behind wall) — proportions to match your reference */}
         {roof === "gable" ? (
           <g>
-            {/* top plane with eave */}
+            {/* top ridge plane with eave */}
             <polygon
-              points={`${-eave},-${roofH} ${L + eave},-${roofH} ${L + sox},${soy - roofH * 0.2} ${sox},${soy - roofH * 0.2}`}
+              points={`${-eave},-${roofH} ${L + eave},-${roofH} ${L + sox},${soy - roofH * 0.5} ${sox},${soy - roofH * 0.5}`}
               fill={roofMat === 'metal' ? 'url(#corr)' : shade(woodColors.mid, -0.16)}
               stroke={roofMat === 'metal' ? '#6B7280' : woodColors.dark}
               strokeWidth="2"
             />
-            {/* right plane */}
+            {/* right face */}
             <polygon
-              points={`${L * 0.5},-${roofH} ${L + sox * 0.5},${soy - roofH} ${L + sox},${soy} ${L},0`}
+              points={`${L * 0.55},-${roofH} ${L + sox * 0.55},${soy - roofH} ${L + sox},${soy} ${L},0`}
               fill={roofMat === 'metal' ? 'url(#corr)' : shade(woodColors.mid,-0.22)}
               stroke={roofMat === 'metal' ? '#6B7280' : woodColors.dark}
               strokeWidth="2"
               opacity=".95"
             />
-            {/* left plane */}
+            {/* left face */}
             <polygon
-              points={`${L * 0.5},-${roofH} ${sox * 0.5},${soy - roofH} ${sox},${soy} 0,0`}
-              fill={roofMat === 'metal' ? 'url(#corr)' : shade(woodColors.mid,-0.2)}
+              points={`${L * 0.45},-${roofH} ${sox * 0.45},${soy - roofH} ${sox},${soy} 0,0`}
+              fill={roofMat === 'metal' ? 'url(#corr)' : shade(woodColors.mid,-0.20)}
               stroke={roofMat === 'metal' ? '#6B7280' : woodColors.dark}
               strokeWidth="2"
               opacity=".95"
@@ -398,7 +423,7 @@ function CoopSVG({ woodColors, meshStroke, roof, roofMat, lengthFt, levels, time
           </g>
         )}
 
-        {/* side/back wall */}
+        {/* side/back wall (in front of roof) */}
         <polygon points={`${L},0 ${L+sox},${soy} ${L+sox},${coopH+soy} ${L},${coopH}`} fill={shade(woodColors.base,-.1)} stroke={shade(woodColors.dark,-.3)} strokeWidth="2" />
         {Array.from({length:6}).map((_,i)=>(<line key={i} x1={L} y1={(i+1)*(coopH/7)} x2={L+sox} y2={(i+1)*(coopH/7)+soy} stroke={woodColors.dark} strokeOpacity=".25" />))}
 
@@ -406,26 +431,39 @@ function CoopSVG({ woodColors, meshStroke, roof, roofMat, lengthFt, levels, time
         <path d={`M 0 0 L ${L} 0 L ${L} ${coopH} L 0 ${coopH} Z`} fill={woodColors.base} stroke={woodColors.dark} strokeWidth="2" />
         <rect x={0} y={0} width={L} height={coopH} fill="url(#grain-wood)" opacity=".45" />
 
-        {/* partial loft + ramp (second level sleeping) */}
+        {/* partial loft + vertical ladder (levels=2) */}
         {levels === 2 && (
           <g>
-            {/* loft */}
-            <rect x={unit*0.8} y={coopH*0.44} width={L*0.58} height={unit*0.9} rx="6"
-              fill={shade(woodColors.base,-0.05)} stroke={woodColors.dark} strokeWidth="2" opacity=".95"/>
-            {/* ramp down to right */}
-            <polygon
-              points={`${L*0.45},${coopH*0.46} ${L*0.86},${coopH*0.68} ${L*0.82},${coopH*0.74} ${L*0.42},${coopH*0.51}`}
-              fill={shade(woodColors.base,-0.08)} stroke={woodColors.dark} strokeWidth="2" opacity=".9"/>
-            {Array.from({length:5}).map((_,i)=>(
-              <line key={i}
-                x1={L*0.44 + i*(L*0.08)} y1={coopH*0.485 + i*(coopH*0.045)}
-                x2={L*0.50 + i*(L*0.08)} y2={coopH*0.515 + i*(coopH*0.045)}
-                stroke={woodColors.dark} strokeWidth="2" opacity=".6"/>
+            {/* loft platform high on left */}
+            <rect
+              x={unit * 0.8}
+              y={coopH * 0.25}
+              width={L * 0.65}
+              height={unit * 0.9}
+              rx="6"
+              fill={shade(woodColors.base, -0.05)}
+              stroke={woodColors.dark}
+              strokeWidth="2"
+              opacity="0.95"
+            />
+            {/* vertical ladder */}
+            <line x1={unit * 2.8} y1={coopH * 0.25} x2={unit * 2.8} y2={coopH - unit * 0.2} stroke={woodColors.dark} strokeWidth="2"/>
+            <line x1={unit * 3.2} y1={coopH * 0.25} x2={unit * 3.2} y2={coopH - unit * 0.2} stroke={woodColors.dark} strokeWidth="2"/>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <line
+                key={i}
+                x1={unit * 2.8}
+                y1={coopH * 0.25 + i * (unit * 0.6)}
+                x2={unit * 3.2}
+                y2={coopH * 0.25 + i * (unit * 0.6)}
+                stroke={woodColors.dark}
+                strokeWidth="2"
+              />
             ))}
           </g>
         )}
 
-        {/* lower door moved near floor */}
+        {/* main door lowered near floor */}
         <g>
           <rect
             x={unit * 0.8}
@@ -437,9 +475,7 @@ function CoopSVG({ woodColors, meshStroke, roof, roofMat, lengthFt, levels, time
             stroke={woodColors.dark}
             strokeWidth="2"
           />
-          {/* knob */}
           <circle cx={unit * 3.3} cy={coopH - unit * 1.8} r={2.5} fill={meshStroke} />
-          {/* timed-door badge */}
           {timedDoor && (
             <g transform={`translate(${unit*0.9}, ${coopH - unit*3.3})`} opacity=".9">
               <rect width="20" height="14" rx="3" fill="#0b0b0c" stroke="#666" />
